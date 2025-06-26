@@ -19,7 +19,7 @@ public class PharmacyController {
     @Autowired
     private PharmacyService pharmacyService;
 
-    @GetMapping
+    @GetMapping("/getAll")
     public ResponseEntity<List<Pharmacy>> getAllPharmacies() {
         return ResponseEntity.ok(pharmacyService.getAllPharmacies());
     }
@@ -29,7 +29,7 @@ public class PharmacyController {
         return ResponseEntity.ok(pharmacyService.getPharmacyById(id));
     }
 
-    @PostMapping
+    @PostMapping("/createpharmacy")
     public ResponseEntity<Pharmacy> createPharmacy(@Valid @RequestBody Pharmacy pharmacy) {
         return ResponseEntity.ok(pharmacyService.createPharmacy(pharmacy));
     }

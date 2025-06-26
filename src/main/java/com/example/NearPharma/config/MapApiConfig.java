@@ -4,13 +4,13 @@ package com.example.NearPharma.config;
 import org.springframework.beans.factory.annotation.Value;
 
 public class MapApiConfig {
-    @Value("${google.api.key}")
-    public String apiKey;
+    @Value("${rapidapi.key}")
+    private String rapidApiKey;
     public String googleApiKey(){
-        if(apiKey==null || apiKey.isEmpty()){
+        if(rapidApiKey==null || rapidApiKey.isEmpty()){
             throw new IllegalStateException("Google map api key is missing.");
         }
-        return apiKey;
+        return rapidApiKey;
     }
 
 }

@@ -5,30 +5,30 @@ import com.example.NearPharma.Mapper.parseNearbyResponse;
 import com.example.NearPharma.model.Pharmacy;
 import com.example.NearPharma.repo.PharmacyRepository;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class PharmacyService implements parseDistanceMatrixResponse, parseNearbyResponse {
-    @Value("${google.api.key}")
-    public String apiKey;
+    @Value("${rapidApiKey.key}")
+    private String rapidApiKey;
+
     @Autowired
     private PharmacyRepository pharmacyRepository;
-    @Value("${google.api.key}")
-    private String Apikey;
+
     private final RestTemplate restTemplate = new RestTemplate();
 
     public List<Pharmacy> getAllPharmacies() {
-        return getAllPharmacies();
+        return pharmacyRepository.findAll();
     }
 
     public Pharmacy getPharmacyById(Long id) {
@@ -61,45 +61,65 @@ public class PharmacyService implements parseDistanceMatrixResponse, parseNearby
     public List<Map<String, Object>> getDistances(double lat, double lng, String mode) {
         try {
             List<Pharmacy> pharmacies = pharmacyRepository.findAll();
+            StringBuilder origins = new StringBuilder(lat + "," + lng);
             String destinations = pharmacies.stream()
                     .map(p -> p.getLatitude() + "," + p.getLongitude())
-                    .collect(Collectors.joining("|"));
+                    .collect(Collectors.joining(";"));
 
-            String url = String.format("https://maps.googleapis.com/maps/api/distancematrix/json?origins=%f,%f&destinations=%s&mode=%s&key=%s",
-                    lat, lng, destinations, mode, apiKey);
+            String url = "https://trueway-matrix.p.rapidapi.com/CalculateDrivingMatrix?" +
+                    "origins=" + origins + "&destinations=" + destinations;
 
-            ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("x-rapidapi-host", "trueway-matrix.p.rapidapi.com");
+            headers.set("x-rapidapi-key", rapidApiKey);
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, entity, Map.class);
+            System.out.println("sub"+response.getBody());
             return parseDistanceMatrixResponse(response.getBody(), pharmacies);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to fetch distance matrix", e);
+            throw new RuntimeException("Failed to fetch distance matrix from RapidAPI", e);
         }
     }
 
     public Map<String, Object> getDirections(Long id, double fromLat, double fromLng, String mode) {
         try {
             Pharmacy target = pharmacyRepository.findById(id).orElseThrow();
-            String url = String.format("https://maps.googleapis.com/maps/api/directions/json?origin=%f,%f&destination=%f,%f&mode=%s&key=%s",
-                    fromLat, fromLng, target.getLatitude(), target.getLongitude(), mode, apiKey);
+            String stops = fromLat + "," + fromLng + ";" + target.getLatitude() + "," + target.getLongitude();
 
-            ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
+            String url = "https://trueway-directions2.p.rapidapi.com/FindDrivingRoute?stops=" + stops;
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("x-rapidapi-host", "trueway-directions2.p.rapidapi.com");
+            headers.set("x-rapidapi-key", rapidApiKey);
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, entity, Map.class);
+            System.out.println("wars"+response.getBody());
             return response.getBody();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to fetch directions", e);
+            throw new RuntimeException("Failed to fetch directions from RapidAPI", e);
         }
     }
+
 
     public Map<String, Object> getNearbyPharmacies(Long id, int radius, List<String> chains) {
         try {
             Pharmacy source = pharmacyRepository.findById(id).orElseThrow();
 
-            String url = String.format("https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=%f,%f&radius=%d&type=pharmacy&key=%s",
-                    source.getLatitude(), source.getLongitude(), radius, apiKey);
+            String url = "https://trueway-places.p.rapidapi.com/FindPlacesNearby?" +
+                    "location=" + source.getLatitude() + "," + source.getLongitude() +
+                    "&radius=" + radius + "&type=pharmacy";
 
-            ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("x-rapidapi-host", "trueway-places.p.rapidapi.com");
+            headers.set("x-rapidapi-key", rapidApiKey);
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, entity, Map.class);
             return parseNearbyResponse(response.getBody(), chains);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to fetch nearby pharmacies", e);
+            throw new RuntimeException("Failed to fetch nearby pharmacies from RapidAPI", e);
         }
     }
-
 }
