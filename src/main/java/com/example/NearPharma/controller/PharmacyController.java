@@ -83,4 +83,13 @@ public class PharmacyController {
         return ResponseEntity.ok(pharmacyService.getNearbyPharmacies(id, radius, chains));
     }
 
+    @GetMapping("/places/search")
+    public ResponseEntity<?> searchPlaces(
+            @RequestParam String query,
+            @RequestParam(required = false) List<String> types,
+            @RequestParam(defaultValue = "23.0225") double lat,  // optional location center
+            @RequestParam(defaultValue = "72.5714") double lng
+    ) {
+        return ResponseEntity.ok(pharmacyService.searchPlaces(query, types, lat, lng));
+    }
 }
