@@ -17,6 +17,18 @@
 * Maven
 * RapidAPI Account
 
+for running this backend Application on your device simply 
+simple make .env.properties in the root directory
+### Configure for the same will be like this
+rapidApiKey.key=xyz
+DB_DATABASE=database_name
+DB_USERNAME=username_in_the_db
+DB_PASSWORD=user_password
+
+ensure that you have docker already present in your system
+simply run this command 
+docker compose up --build
+
 ### 2. Configure `application.properties`
 
 ```properties
