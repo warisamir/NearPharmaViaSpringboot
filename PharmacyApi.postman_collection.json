@@ -1,0 +1,80 @@
+{
+	"info": {
+		"_postman_id": "2f24688e-c866-46e8-88db-dc429ce5e194",
+		"name": "PharmacyApi",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "23529167",
+		"_collection_link": "https://crimson-shuttle-815992.postman.co/workspace/New-Team-Workspace~31537596-0a34-4c5f-995e-ded5a7d74e54/collection/23529167-2f24688e-c866-46e8-88db-dc429ce5e194?action=share&source=collection_link&creator=23529167"
+	},
+	"item": [
+		{
+			"name": "Crud Pharmacy",
+			"item": [
+				{
+					"name": "GetAllPharmacy",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "createPharmacy",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "UpdatePharmacy",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "DeletePharmacy",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "pharmacy distances",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "getnearbyOtherPharmacy",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Location Search",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "routeDirectionToPharmacy",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}

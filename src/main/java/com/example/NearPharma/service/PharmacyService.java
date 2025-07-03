@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class PharmacyService implements parseDistanceMatrixResponse, parseNearbyResponse {
     @Value("${rapidApiKey.key}")
     private String rapidApiKey;
-    private Double radiusKm=2.00;
+    private Double radiusKm=5.00;
     @Autowired
     private PharmacyRepository pharmacyRepository;
 
@@ -128,7 +128,6 @@ public class PharmacyService implements parseDistanceMatrixResponse, parseNearby
             HttpHeaders headers = new HttpHeaders();
             headers.set("x-rapidapi-host", "trueway-matrix.p.rapidapi.com");
             headers.set("x-rapidapi-key", rapidApiKey);
-
             HttpEntity<String> entity = new HttpEntity<>(headers);
             ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, entity, Map.class);
 
