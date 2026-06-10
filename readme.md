@@ -1,197 +1,164 @@
-# NearPharma API Documentation
+<h1>NearPharma — Location-Based Pharmacy Finder API</h1>
 
-## 📄 Project Overview
+<p>
+  <img src="https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Spring%20Boot-3.x-6DB33F?style=for-the-badge&logo=springboot&logoColor=white"/>
+  <img src="https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white"/>
+  <img src="https://img.shields.io/badge/RapidAPI-Integrated-0055DA?style=for-the-badge&logo=rapid&logoColor=white"/>
+</p>
 
-**Project Name**: NearPharma
-**Description**: A Spring Boot-based service to locate pharmacies nearby, get directions, search healthcare-related places, and filter chains using RapidAPI services.
+A **Spring Boot REST API** that locates nearby pharmacies based on user coordinates, provides
+turn-by-turn directions, filters by pharmacy chain, and searches healthcare places —
+powered by RapidAPI's TrueWay services and backed by PostgreSQL.
 
 ---
 
-## ⚙️ Setup Instructions
+## ✨ Features
 
-### 1. Requirements
+- 📍 **Proximity search** — find pharmacies sorted by distance from user's lat/lng
+- 🗺️ **Directions** — get driving/walking/cycling/transit routes to any pharmacy
+- 🏥 **Chain filtering** — filter results by pharmacy chain (Apollo, MedPlus, etc.)
+- 🔍 **Healthcare place search** — search for hospitals, dentists, clinics nearby
+- 🐳 **Docker Compose** — one command to run the full stack locally
+- 📬 **Postman collection** — included for easy API testing
 
-* Java 17+
-* Spring Boot 3+
-* PostgreSQL
-* Maven
-* RapidAPI Account
+---
 
-for running this backend Application on your device simply 
-simple make .env.properties in the root directory
-### Configure for the same will be like this
-rapidApiKey.key=xyz
-DB_DATABASE=database_name
-DB_USERNAME=username_in_the_db
-DB_PASSWORD=user_password
+## 🏗️ Architecture
 
-ensure that you have docker already present in your system
-simply run this command 
-docker compose up --build
+                 Client Request
+                       │
+                       ▼
+            ┌─────────────────────┐
+            │   REST Controller   │  ← Receives lat/lng, mode, filters
+            └──────────┬──────────┘
+                       │
+            ┌──────────▼──────────┐
+            │    Service Layer    │  ← Distance calc, business logic
+            └──────────┬──────────┘
+                       │
+                 ┌─────┴──────┐
+                 │            │
+            ┌────▼────┐  ┌────▼──────────┐
+            │ JPA Repo│  │  RapidAPI     │
+            │(PostgreSQL││ (TrueWay      │
+            │ pharmacy │ │  Directions + │
+            │  data)   │ │  Places)      │
+            └──────────┘ └───────────────┘
 
-### 2. Configure `application.properties`
+---
 
+---
+
+## 🛠️ Tech Stack
+
+- **Java 17** + **Spring Boot 3.x**
+- **Spring Data JPA** + **PostgreSQL** — pharmacy CRUD and persistence
+- **RapidAPI** — TrueWay Directions + TrueWay Places for routing and search
+- **Docker + Docker Compose** — containerized full-stack setup
+- **Maven** — build and dependency management
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Java 17+
+- Docker + Docker Compose
+- RapidAPI account (free tier works) — get your key at [rapidapi.com](https://rapidapi.com)
+
+### 1. Clone the repo
+```bash
+git clone https://github.com/warisamir/NearPharmaViaSpringboot.git
+cd NearPharmaViaSpringboot
+```
+
+### 2. Create environment file
+Create `.env.properties` in the root directory:
 ```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/pharma_db
-spring.datasource.username=your_db_username
-spring.datasource.password=your_db_password
-
-rapidapi.key=YOUR_RAPID_API_KEY
+rapidApiKey.key=YOUR_RAPIDAPI_KEY
+DB_DATABASE=pharma_db
+DB_USERNAME=your_db_username
+DB_PASSWORD=your_db_password
 ```
 
-### 3. Dependencies (`pom.xml`)
-
-```xml
-<dependencies>
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-data-jpa</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.postgresql</groupId>
-        <artifactId>postgresql</artifactId>
-    </dependency>
-</dependencies>
-```
-
----
-
-## 📂 API Endpoints
-
-### 1. Add Sample Pharmacies
-
-**POST** `/api/pharmacies/createpharmacy`
-
-### 2. Get All Pharmacies
-
-**GET** `/api/pharmacies/getAll`
-
-### 3. Get Pharmacy by ID
-
-**GET** `/api/pharmacies/{id}`
-
-### 4. Update Pharmacy by ID
-
-**PUT** `/api/pharmacies/{id}`
-
-### 5. Delete Pharmacy by ID
-
-**Delete** `/api/pharmacies/{id}`
-
----
-
-### 6. Get Nearby Pharmacies with Distance
-
-**GET** `/api/pharmacies/distances`
-
-#### Query Parameters:
-
-| Param  | Type   | Required | Description                                                       |
-| ------ | ------ | -------- | ----------------------------------------------------------------- |
-| `lat`  | double | Yes      | Latitude                                                          |
-| `lng`  | double | Yes      | Longitude                                                         |
-| `mode` | string | No       | `driving`, `walking`, `bicycling`, `transit` (default: `driving`) |
-
-#### Example:
-
-```
-GET /api/pharmacies/distances?lat=23.0225&lng=72.5714&mode=driving
-```
----
-
-### 4. Get Directions to Pharmacy
-
-**GET** `/api/pharmacies/{id}/directions`
-
-#### Query Parameters:
-
-| Param     | Type   | Required | Description      |
-| --------- | ------ | -------- | ---------------- |
-| `fromLat` | double | Yes      | Source Latitude  |
-| `fromLng` | double | Yes      | Source Longitude |
-| `mode`    | string | No       | Mode of travel   |
-
-#### Example:
-
-```
-GET /api/pharmacies/3/directions?fromLat=23.0225&fromLng=72.5714&mode=driving
-```
-
----
-
-### 5. Find Nearby Pharmacy Chains
-
-**GET** `/api/pharmacies/{id}/nearby`
-
-#### Query Parameters:
-
-| Param    | Type            | Required | Description                     |
-| -------- | --------------- | -------- | ------------------------------- |
-| `radius` | int (500-10000) | No       | Radius in meters (default 2000) |
-| `chains` | List of String  | No       | Filter by pharmacy chain names  |
-
-#### Example:
-
-```
-GET /api/pharmacies/3/nearby?radius=3000&chains=Apollo&chains=MedPlus
-```
-
----
-
-### 6. Search Healthcare Places
-
-**GET** `/api/pharmacies/places/search`
-
-#### Query Parameters:
-
-| Param   | Type           | Required | Description                                                  |
-| ------- | -------------- | -------- | ------------------------------------------------------------ |
-| `query` | string         | Yes      | Search text (e.g., pharmacy)                                 |
-| `types` | List of String | No       | `pharmacy`, `hospital`, `doctor`, `dentist`, `establishment` |
-| `lat`   | double         | Yes      | Latitude                                                     |
-| `lng`   | double         | Yes      | Longitude                                                    |
-
-#### Example:
-
-```
-GET /api/pharmacies/places/search?query=pharmacy&types=pharmacy&lat=23.0225&lng=72.5714
-```
-
----
-
-## 🔢 Sample cURL Requests
-
-### 1. Get Route
-
+### 3. Run with Docker Compose
 ```bash
-curl -X GET "https://trueway-directions2.p.rapidapi.com/FindDrivingRoute?stops=23.0225,72.5714;23.0256,72.5718" \
-  -H "x-rapidapi-host: trueway-directions2.p.rapidapi.com" \
-  -H "x-rapidapi-key: YOUR_RAPID_API_KEY"
+docker compose up --build
 ```
 
-### 2. Place Search
-
-```bash
-curl -X GET "https://trueway-places.p.rapidapi.com/FindPlaceByText?input=pharmacy&location=23.0225,72.5714&types=pharmacy" \
-  -H "x-rapidapi-host: trueway-places.p.rapidapi.com" \
-  -H "x-rapidapi-key: YOUR_RAPID_API_KEY"
-```
+API will be available at `http://localhost:8080`
 
 ---
 
-## 🚀 Future Enhancements
+## 📡 API Endpoints
 
-* Real-time open/close status from Google API
-* Map UI integration for displaying routes
-* Support for filtering by rating or hours
+### Pharmacy CRUD
+
+POST   /api/pharmacies/createpharmacy     — Add a pharmacy
+GET    /api/pharmacies/getAll             — List all pharmacies
+GET    /api/pharmacies/{id}               — Get pharmacy by ID
+PUT    /api/pharmacies/{id}               — Update pharmacy
+DELETE /api/pharmacies/{id}               — Delete pharmacy     
+
+### Location & Discovery
+
+GET /api/pharmacies/distances
+?lat=12.9716&lng=77.5946&mode=driving
+— Get all pharmacies sorted by distance from coordinates
+GET /api/pharmacies/{id}/directions
+?fromLat=12.9716&fromLng=77.5946&mode=walking
+— Get turn-by-turn directions to a specific pharmacy
+GET /api/pharmacies/{id}/nearby
+?radius=3000&chains=Apollo&chains=MedPlus
+— Find nearby pharmacies, optionally filtered by chain name
+GET /api/pharmacies/places/search
+?query=pharmacy&types=pharmacy&lat=12.9716&lng=77.5946
+— Search healthcare places near coordinates
+
+### Travel modes
+`driving` · `walking` · `bicycling` · `transit` (default: `driving`)
 
 ---
 
-## 🚀 Author
+## 📬 Testing with Postman
 
-**Waris Amir**
-Backend & Full-Stack Developer
+A full Postman collection is included — `PharmacyApi.postman_collection.json`
+
+1. Open Postman → Import → select the file
+2. Set `baseUrl` variable to `http://localhost:8080`
+3. All endpoints are pre-configured with example parameters
+
+---
+
+## 📁 Project Structure
+
+NearPharmaViaSpringboot/
+├── src/
+│   └── main/java/
+│       ├── controller/     ← REST endpoints
+│       ├── service/        ← Business logic + RapidAPI calls
+│       ├── repository/     ← Spring Data JPA
+│       └── model/          ← Pharmacy entity
+├── Dockerfile
+├── compose.yaml            ← Docker Compose (app + PostgreSQL)
+├── PharmacyApi.postman_collection.json
+└── pom.xml
+
+---
+
+## 🔮 Planned Enhancements
+
+- [ ] Real-time open/close status from Google Places API
+- [ ] Map UI (React frontend) for visual route display
+- [ ] Filter by pharmacy rating and operating hours
+- [ ] Redis caching for frequent location queries
+
+---
+
+## 👤 Author
+
+**Waris Amir** — Java Backend Engineer, Bangalore
+[LinkedIn](https://linkedin.com/in/waris-amir-0387461b3) · [Portfolio](https://portfolio-git-main-warisamirs-projects.vercel.app/) · [GitHub](https://github.com/warisamir)
+
