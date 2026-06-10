@@ -134,17 +134,17 @@ A full Postman collection is included — `PharmacyApi.postman_collection.json`
 
 ## 📁 Project Structure
 
-NearPharmaViaSpringboot/
-├── src/
-│   └── main/java/
-│       ├── controller/     ← REST endpoints
-│       ├── service/        ← Business logic + RapidAPI calls
-│       ├── repository/     ← Spring Data JPA
-│       └── model/          ← Pharmacy entity
-├── Dockerfile
-├── compose.yaml            ← Docker Compose (app + PostgreSQL)
-├── PharmacyApi.postman_collection.json
-└── pom.xml
+    NearPharmaViaSpringboot/
+    ├── src/
+    │   └── main/java/
+    │       ├── controller/     ← REST endpoints
+    │       ├── service/        ← Business logic + RapidAPI calls
+    │       ├── repository/     ← Spring Data JPA
+    │       └── model/          ← Pharmacy entity
+    ├── Dockerfile
+    ├── compose.yaml            ← Docker Compose (app + PostgreSQL)
+    ├── PharmacyApi.postman_collection.json
+    └── pom.xml
 
 ---
 
