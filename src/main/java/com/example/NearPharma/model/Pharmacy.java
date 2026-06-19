@@ -49,4 +49,11 @@ public class Pharmacy {
         return is24x7;
     }
 
-    public void setIs24x7(b
+    public void setIs24x7(boolean is24x7) {
+        this.is24x7 = is24x7;
+    }
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private Timestamp createdAt;
+}

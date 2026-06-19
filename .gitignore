@@ -30,4 +30,8 @@ build/
 !**/src/test/**/build/
 config/.env.properties
 env.properties
-### 
+### VS Code ###
+.vscode/
+### Database files ###
+*.db
+*.sqlite

@@ -26,4 +26,12 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: secret
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      # Reads RAPIDAPI_KEY from your host shell environment: export RAPIDAPI_KEY
+      # Reads RAPIDAPI_KEY from your host shell environment: export RAPIDAPI_KEY=your_key
+      RAPIDAPI_KEY: ${RAPIDAPI_KEY}
+    networks:
+      - spring-network
+volumes:
+  pg_data:
+
+networks:
+  spring-network:

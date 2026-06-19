@@ -38,4 +38,12 @@ public interface parseNearbyResponse {
             ));
 
             // open_now is returned directly in TrueWay response (not nested)
-            Object openNow = place.get("open_now"
+            Object openNow = place.get("open_now");
+            pharmacy.put("isOpen", Boolean.TRUE.equals(openNow));
+
+            nearbyList.add(pharmacy);
+        }
+
+        return Map.of("nearbyPharmacies", nearbyList);
+    }
+}

@@ -91,4 +91,7 @@ public class PharmacyController {
             @RequestParam String query,
             @RequestParam(required = false) List<String> types,
             @RequestParam(defaultValue = "23.0225") double lat,
-            @RequestParam(def
+            @RequestParam(defaultValue = "72.5714") double lng) {
+        return ResponseEntity.ok(pharmacyService.searchPlaces(query, types, lat, lng));
+    }
+}
