@@ -1,22 +1,22 @@
 services:
   postgres:
     image: postgres:15
-    container_name: postgres_db
+    container_name: nearpharma_postgres
     environment:
       POSTGRES_DB: mydb
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: secret
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
-      - pg_data:/var/lib.postgresql/data
+      - pg_data:/var/lib/postgresql/data
     networks:
       - spring-network
   springboot-app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: springboot_app
+    container_name: nearpharma_app
     depends_on:
       - postgres
     ports:
@@ -25,11 +25,5 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/mydb
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: secret
-      SPRING_DATASOURCE_DDL_AUTO: update
-    networks:
-      - spring-network
-volumes:
-  pg_data:
-
-networks:
-  spring-network:
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      # Reads RAPIDAPI_KEY from your host shell environment: export RAPIDAPI_KEY

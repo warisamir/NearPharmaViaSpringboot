@@ -5,41 +5,37 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Parses the TrueWay Places /FindPlacesNearby response.
+ * TrueWay returns: { results: [{ name, address, location: { lat, lng }, rating, ... }] }
+ */
 public interface parseNearbyResponse {
-    default Map<String, Object> parseNearbyResponse(Map response, List<String> chains) {
+
+    @SuppressWarnings("unchecked")
+    default Map<String, Object> parseNearbyResponse(Map<String, Object> response, List<String> chains) {
         List<Map<String, Object>> nearbyList = new ArrayList<>();
-        List results = (List) response.get("results");
+        List<Map<String, Object>> results = (List<Map<String, Object>>) response.get("results");
 
         if (results == null) return Map.of("nearbyPharmacies", nearbyList);
 
-        for (Object obj : results) {
-            Map place = (Map) obj;
-
+        for (Map<String, Object> place : results) {
             String name = (String) place.get("name");
+            if (name == null) continue;
             if (chains != null && chains.stream().noneMatch(name::contains)) continue;
+
+            // TrueWay Places: location is a top-level field, not nested under geometry
+            Map<String, Object> location = (Map<String, Object>) place.get("location");
+            if (location == null) continue;
 
             Map<String, Object> pharmacy = new HashMap<>();
             pharmacy.put("placeId", place.get("place_id"));
             pharmacy.put("name", name);
             pharmacy.put("rating", place.getOrDefault("rating", 0.0));
-            pharmacy.put("address", place.get("vicinity"));
+            pharmacy.put("address", place.get("address"));
+            pharmacy.put("coordinates", Map.of(
+                    "lat", location.get("lat"),
+                    "lng", location.get("lng")
+            ));
 
-            Map geometry = (Map) place.get("geometry");
-            Map location = (Map) geometry.get("location");
-            pharmacy.put("coordinates", location);
-
-            // Optional: Open/Close and hours
-            Map openingHours = (Map) place.get("opening_hours");
-            pharmacy.put("isOpen", openingHours != null && Boolean.TRUE.equals(openingHours.get("open_now")));
-            pharmacy.put("operatingHours", openingHours != null ? openingHours.toString() : "N/A");
-
-            List<String> placeTypes = (List<String>) place.get("types");
-            pharmacy.put("placeTypes", placeTypes);
-
-            nearbyList.add(pharmacy);
-        }
-
-        return Map.of("nearbyPharmacies", nearbyList);
-    }
-
-}
+            // open_now is returned directly in TrueWay response (not nested)
+            Object openNow = place.get("open_now"
