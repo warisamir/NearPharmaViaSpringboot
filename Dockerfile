@@ -4,13 +4,20 @@ FROM maven:3.9.6-eclipse-temurin-17 AS builder
 
 WORKDIR /app
 
-# Copy pom.xml and download dependencies (cached layer)
+# Copy Maven wrapper and pom.xml
+COPY .mvn .mvn
+COPY mvnw mvnw
 COPY pom.xml .
-RUN mvn dependency:go-offline -q
+
+# Make mvnw executable and download dependencies
+RUN chmod +x mvnw && ./mvnw dependency:go-offline
 
 # Copy source code and build JAR
 COPY src ./src
-RUN mvn package -Dmaven.test.skip=true -q
+RUN ./mvnw package -Dmaven.test.skip=true
+
+# Verify JAR was created
+RUN ls -lh /app/target/*.jar || (echo "ERROR: JAR build failed" && exit 1)
 
 # ── Stage 2: Runtime ──────────────────────────────────────────────────────────
 # Use lightweight JRE for running the application
