@@ -1,35 +1,37 @@
 # ── Stage 1: Build ────────────────────────────────────────────────────────────
-# Use Maven + JDK to build the application
 FROM maven:3.9.6-eclipse-temurin-17 AS builder
 
 WORKDIR /app
 
-# Copy Maven wrapper and pom.xml
-COPY .mvn .mvn
-COPY mvnw mvnw
+# Copy pom.xml first
 COPY pom.xml .
 
-# Make mvnw executable and download dependencies
-RUN chmod +x mvnw && ./mvnw dependency:go-offline
+# Download dependencies (cached separately)
+RUN mvn clean verify -q --fail-at-end || mvn help:active-profiles
 
-# Copy source code and build JAR
-COPY src ./src
-RUN ./mvnw package -Dmaven.test.skip=true
+# Copy all project files
+COPY . .
 
-# Verify JAR was created
-RUN ls -lh /app/target/*.jar || (echo "ERROR: JAR build failed" && exit 1)
+# Build application - with verbose output
+RUN mvn package -Dmaven.test.skip=true -e || { \
+    echo "BUILD FAILED"; \
+    find . -name "*.jar" -type f; \
+    exit 1; \
+  }
+
+# List build artifacts for debugging
+RUN echo "=== Build artifacts ===" && \
+    ls -lah target/ && \
+    ls -lah target/*.jar 2>/dev/null || echo "No JAR found in target/"
 
 # ── Stage 2: Runtime ──────────────────────────────────────────────────────────
-# Use lightweight JRE for running the application
 FROM eclipse-temurin:17-jre-jammy
 
 WORKDIR /app
 
-# Copy built JAR from builder stage
+# Copy JAR from builder
 COPY --from=builder /app/target/NearPharma-0.0.1-SNAPSHOT.jar app.jar
 
-# Expose port
 EXPOSE 8080
 
-# All config is injected via environment variables at runtime
 ENTRYPOINT ["java", "-jar", "/app.jar"]
