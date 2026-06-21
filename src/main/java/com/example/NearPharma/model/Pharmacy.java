@@ -7,37 +7,30 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "pharmacies")
+@Table(name="pharmacies")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Pharmacy {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @NotBlank
-    @Column(nullable = false)
-    private String name;
-
+    String name;
     @NotBlank
-    @Column(nullable = false)
-    private String address;
-
+    String address;
     @DecimalMin("-90.0")
     @DecimalMax("90.0")
     private double latitude;
 
-    @DecimalMin("-180.0")
-    @DecimalMax("180.0")
+    @DecimalMin("-90.0")
+    @DecimalMax("90.0")
     private double longitude;
-
     private String phone;
     private String chain;
     private String pincode;
@@ -49,4 +42,12 @@ public class Pharmacy {
         return is24x7;
     }
 
-    public void setIs24x7(b
+    public void setIs24x7(boolean is24x7) {
+        this.is24x7 = is24x7;
+    }
+
+
+
+    private Timestamp createdAt=new Timestamp(System.currentTimeMillis());
+
+}

@@ -169,7 +169,7 @@ class PharmacyServiceTest {
         when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(), eq(Map.class)))
                 .thenReturn(new ResponseEntity<>(matrixResponse, HttpStatus.OK));
 
-        List<Map<String, Object>> result = service.getDistances(12.9716, 77.5946, "driving");
+        List<Map<String, Object>> result = service.getDistances(12.9716, 77.5946, "driving", 15.0);
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).get("name")).isEqualTo("Apollo");
@@ -186,7 +186,7 @@ class PharmacyServiceTest {
         when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(), eq(Map.class)))
                 .thenReturn(new ResponseEntity<>(placesResponse, HttpStatus.OK));
 
-        List<Map<String, Object>> result = service.getDistances(12.9716, 77.5946, "driving");
+        List<Map<String, Object>> result = service.getDistances(12.9716, 77.5946, "driving", 15.0);
 
         assertThat(result).isEmpty();
     }

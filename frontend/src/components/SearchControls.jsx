@@ -1,3 +1,5 @@
+import { useState, useRef, useEffect } from 'react';
+
 const MODES = [
   { value: 'driving',   label: '🚗 Drive'   },
   { value: 'walking',   label: '🚶 Walk'    },
@@ -12,6 +14,21 @@ export default function SearchControls({
   activeChains, onToggleChain,
   onLocate, loading,
 }) {
+  const [localRadius, setLocalRadius] = useState(radius);
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    setLocalRadius(radius);
+  }, [radius]);
+
+  const handleRadiusChange = (newRadius) => {
+    setLocalRadius(newRadius);
+    clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      onRadiusChange(newRadius);
+    }, 500);
+  };
+
   return (
     <div className="controls">
       {/* Locate + mode */}
@@ -35,14 +52,14 @@ export default function SearchControls({
             SEARCH RADIUS
           </span>
           <span style={{ fontSize: '.8rem', fontWeight: 700, color: 'var(--brand-dark)' }}>
-            {radius} km
+            {localRadius} km
           </span>
         </div>
         <input
           type="range"
           min="1" max="50" step="1"
-          value={radius}
-          onChange={e => onRadiusChange(Number(e.target.value))}
+          value={localRadius}
+          onChange={e => handleRadiusChange(Number(e.target.value))}
           style={{ width: '100%', accentColor: 'var(--brand)', cursor: 'pointer' }}
         />
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.68rem', color: 'var(--text-muted)' }}>

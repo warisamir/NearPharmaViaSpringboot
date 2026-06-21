@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: nearpharma_postgres
+    environment:
+      POSTGRES_DB: mydb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5433:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - spring-network
+  springboot-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nearpharma_app
+    depends_on:
+      - postgres
+    ports:
+      - "8081:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/mydb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: secret
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      RAPIDAPI_KEY: 963d2753acmsh2f102529f3c15e8p176c59jsn6473d439345e
+    networks:
+      - spring-network
+
+volumes:
+  pg_data:
+
+networks:
+  spring-network:
+    driver: bridge

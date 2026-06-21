@@ -137,7 +137,7 @@ class PharmacyControllerTest {
 
     @Test
     void getDistances_validParams_returns200() throws Exception {
-        when(pharmacyService.getDistances(anyDouble(), anyDouble(), anyString()))
+        when(pharmacyService.getDistances(anyDouble(), anyDouble(), anyString(), anyDouble()))
                 .thenReturn(List.of(Map.of("name", "Apollo", "distance", "500 meters")));
 
         mockMvc.perform(get("/api/pharmacies/distances")
